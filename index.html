@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>缴费提示</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f5f6f8;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", sans-serif;
+      color: #333;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 360px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 48px 28px 36px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    .icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: #fff3e6;
+      color: #ff8a00;
+      font-size: 30px;
+      line-height: 56px;
+    }
+    .msg {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #333;
+      font-weight: 500;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 32px;
+      min-width: 160px;
+      padding: 12px 40px;
+      background: #07c160;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:active { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">!</div>
+    <div class="msg">该缴费已过期，请重新开具处方单</div>
+    <a class="btn" id="backBtn" href="#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf">返回</a>
+  </div>
+  <script>
+    document.getElementById('backBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = '#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf';
+      window.location.href = target;
+    });
+  </script>
+</body>
+</html>
