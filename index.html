@@ -44,7 +44,7 @@
     }
     .btn {
       display: inline-block;
-      margin-top: 32px;
+      margin-top: 28px;
       min-width: 160px;
       padding: 12px 40px;
       background: #07c160;
@@ -56,20 +56,116 @@
       cursor: pointer;
     }
     .btn:active { opacity: 0.85; }
+    .tip {
+      display: none;
+      margin-top: 20px;
+      padding: 12px;
+      background: #f0faf4;
+      border-radius: 8px;
+      color: #07c160;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .tip.show { display: block; }
+    .link-box {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f7f7f7;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #576b95;
+      word-break: break-all;
+      line-height: 1.5;
+      user-select: all;
+      -webkit-user-select: all;
+    }
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="icon">!</div>
     <div class="msg">该缴费已过期，请重新开具处方单</div>
-    <a class="btn" id="backBtn" href="#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf">返回</a>
+    <button type="button" class="btn" id="backBtn">返回</button>
+    <div class="tip" id="tip"></div>
+    <div class="link-box" id="linkBox">#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf</div>
+    <div class="hint">若未自动跳转：长按上方链接，或点返回后到微信粘贴打开</div>
   </div>
   <script>
-    document.getElementById('backBtn').addEventListener('click', function (e) {
-      e.preventDefault();
-      var target = '#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf';
-      window.location.href = target;
-    });
+    (function () {
+      var MP_LINK = '#小程序://安宁市医疗共同体/kPPPUBbykGJsqJf';
+      var btn = document.getElementById('backBtn');
+      var tip = document.getElementById('tip');
+      var linkBox = document.getElementById('linkBox');
+
+      function isWeChat() {
+        return /MicroMessenger/i.test(navigator.userAgent || '');
+      }
+
+      function showTip(text) {
+        tip.textContent = text;
+        tip.classList.add('show');
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () {
+            return fallbackCopy(text);
+          });
+        }
+        return Promise.resolve(fallbackCopy(text));
+      }
+
+      function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+      }
+
+      // 长按链接区域时选中，方便微信识别
+      linkBox.addEventListener('click', function () {
+        var range = document.createRange();
+        range.selectNodeContents(linkBox);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+
+      btn.addEventListener('click', function () {
+        copyText(MP_LINK).then(function (ok) {
+          if (isWeChat()) {
+            // 网页里 location='#小程序://...' 只会改 hash，打不开小程序。
+            // 微信内更稳妥：复制后引导粘贴，或长按页面上的链接。
+            showTip(ok
+              ? '已复制小程序链接。请打开任意微信聊天，粘贴后点击即可进入。'
+              : '请长按上方蓝色链接，选择打开小程序。');
+          } else {
+            showTip(ok
+              ? '已复制小程序链接。正在尝试打开微信，请在微信中粘贴该链接。'
+              : '请复制上方链接，打开微信后粘贴进入小程序。');
+            // 非微信环境：尝试唤起微信 App
+            setTimeout(function () {
+              window.location.href = 'weixin://';
+            }, 400);
+          }
+        });
+      });
+    })();
   </script>
 </body>
 </html>
